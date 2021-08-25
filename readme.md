@@ -1,5 +1,15 @@
 # Solidity Basic Notes App
 
+---
+
+### TODO:
+
+- A small frontend
+- Lots of testing
+- Some string aux functions :)
+
+---
+
 ## What do I need to run this app?
 
 - [Truffle](https://github.com/trufflesuite/truffle)
