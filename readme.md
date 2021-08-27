@@ -60,10 +60,10 @@ notesContract = await NotesContract.deployed()
 notesContract.address
 
 // We can get our public variables, for example notesCount.
-count = await notesContract.notesCount()
+count = await notesContract.getNotesCount()
 
 // This should print "0", since we haven't created any notes yet.
-count.toNumber()
+count
 
 // Obviously we can create notes.
 await notesContract.createNote("Monday", "I need to learn more about Solidity")

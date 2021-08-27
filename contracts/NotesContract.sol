@@ -7,7 +7,7 @@ contract NotesContract {
     createNote("First Note", "This is a note created by the constructor :)");
   }
 
-  uint public notesCount = 0;
+  uint notesCount = 0;
   uint notesNextID = 0;
 
   struct Note {
@@ -24,6 +24,7 @@ contract NotesContract {
 
   // Event created to return logs in createNote
   event NoteCreated(uint id, string title, string content, address owner);
+  // Event created to return logs in deleteNote
   event NoteDeleted(bool deleted);
 
   /*
