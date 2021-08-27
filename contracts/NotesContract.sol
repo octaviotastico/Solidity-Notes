@@ -33,7 +33,7 @@ contract NotesContract {
   * @param content: Content of the note.
   */
   function createNote(string memory _title, string memory _content) public {
-    Note memory note = Note({
+    notes[notesNextID] = Note({
       id: notesNextID,
       title: _title,
       content: _content,
@@ -42,12 +42,11 @@ contract NotesContract {
       createdAt: block.timestamp,
       updatedAt: block.timestamp
     });
-    notes[notesNextID] = note;
+
+    emit NoteCreated(notesNextID, _title, _content, msg.sender);
 
     notesCount++;
     notesNextID++;
-
-    emit NoteCreated(note.id, note.title, note.content, note.owner);
   }
 
 
@@ -79,11 +78,9 @@ contract NotesContract {
   * @param id: ID of the note.
   * @param title: New title of the note.
   */
-  function updateTitle(uint _id, string memory _title) public view returns (uint) {
-    Note memory note = notes[_id];
-    note.title = _title;
-    note.updatedAt = block.timestamp;
-    return note.id;
+  function updateTitle(uint _id, string memory _title) public {
+    notes[_id].title = _title;
+    notes[_id].updatedAt = block.timestamp;
   }
 
 
@@ -92,11 +89,9 @@ contract NotesContract {
   * @param id: ID of the note.
   * @param content: New content of the note.
   */
-  function updateContent(uint _id, string memory _content) public view returns (uint) {
-    Note memory note = notes[_id];
-    note.content = _content;
-    note.updatedAt = block.timestamp;
-    return note.id;
+  function updateContent(uint _id, string memory _content) public {
+    notes[_id].content = _content;
+    notes[_id].updatedAt = block.timestamp;
   }
 
 
@@ -106,10 +101,9 @@ contract NotesContract {
   * @param title: New title of the note.
   * @param content: New content of the note.
   */
-  function updateNote(uint _id, string memory _title, string memory _content) public view returns (uint) {
+  function updateNote(uint _id, string memory _title, string memory _content) public {
     updateTitle(_id, _title);
     updateContent(_id, _content);
-    return _id;
   }
 
 
@@ -141,6 +135,7 @@ contract NotesContract {
 
   /*
   * @dev Returns a filtered array with all the notes of a given owner.
+  * @param owner: Address of the owner.
   */
   function getNotesByOwner(address _owner) public view returns (Note[] memory) {
     Note[] memory notesArray = new Note[](notesCount);
@@ -157,6 +152,7 @@ contract NotesContract {
 
   /*
   * @dev Returns a filtered array with all the notes with a given title.
+  * @param title: Title of the notes to be returned.
   */
   function getNotesByTitle(string memory _title) public view returns (Note[] memory) {
     Note[] memory notesArray = new Note[](notesCount);
@@ -173,7 +169,7 @@ contract NotesContract {
 
   ///// AUX Functions /////
   function compareStrings(string memory a, string memory b) internal pure returns (bool) {
-    return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    return keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b)));
   }
 
 }
