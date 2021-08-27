@@ -4,7 +4,7 @@ pragma solidity ^0.8.7;
 contract NotesContract {
 
   constructor() {
-    createNote("Example title", "Example content");
+    createNote("First Note", "This is a note created by the constructor :)");
   }
 
   uint public notesCount = 0;
@@ -22,13 +22,16 @@ contract NotesContract {
 
   mapping (uint => Note) public notes;
 
+  // Event created to return logs in createNote
+  event NoteCreated(uint id, string title, string content, address owner);
+  event NoteDeleted(bool deleted);
 
   /*
   * @dev Creates a new note and inserts it in the notes map.
   * @param title: Title of the note.
   * @param content: Content of the note.
   */
-  function createNote(string memory _title, string memory _content) public returns (uint) {
+  function createNote(string memory _title, string memory _content) public {
     Note memory note = Note({
       id: notesNextID,
       title: _title,
@@ -43,7 +46,7 @@ contract NotesContract {
     notesCount++;
     notesNextID++;
 
-    return note.id;
+    emit NoteCreated(note.id, note.title, note.content, note.owner);
   }
 
 
@@ -51,8 +54,22 @@ contract NotesContract {
   * @dev Returns the note with the given id.
   * @param id: ID of the note.
   */
-  function getNote(uint _id) public view returns (string memory, string memory) {
-    return (notes[_id].title, notes[_id].content);
+  function getNote(uint _id) public view returns (string memory, string memory, address, uint, uint) {
+    return (
+      notes[_id].title,
+      notes[_id].content,
+      notes[_id].owner,
+      notes[_id].createdAt,
+      notes[_id].updatedAt
+    );
+  }
+
+
+  /*
+  * @dev Returns the amount of created notes.
+  */
+  function getNotesCount() public view returns (uint) {
+    return notesCount;
   }
 
 
@@ -99,13 +116,13 @@ contract NotesContract {
   * @dev Deletes a note by the given id.
   * @param id: ID of the note.
   */
-  function deleteNote(uint _id) public returns (bool) {
+  function deleteNote(uint _id) public {
     if (notes[_id].owner == msg.sender) {
       delete notes[_id];
       notesCount--;
-      return true;
+      emit NoteDeleted(true);
     }
-    return false;
+    emit NoteDeleted(false);
   }
 
 
