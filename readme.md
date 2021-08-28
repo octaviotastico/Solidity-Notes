@@ -2,7 +2,7 @@
 
 ---
 
-## About this repo
+## **About this repo**
 
 This is a repo used to learn about Solidity and Smart Contracts.
 
@@ -10,12 +10,12 @@ Inside the `contracts` directory, you will find the contracts I created.
 
 So far there's only two of them: NotesContract and LotteryContract.
 
-- NotesContract: It's a very very simple contract that lets you create, read, update, and delete some notes, that consists only on a title and a description.
+- **NotesContract**: It's a very very simple contract that lets you create, read, update, and delete some notes, that consists only on a title and a description.
 
-- LotteryContract: It's a lottery system where players can buy tickets for a lottery. When the admin decides to end the lottery, one of the users that bought a ticket will be choosen at random and will win 90% of the balance so far and the admin will keep the remaining 10%.
+- **LotteryContract**: It's a lottery system where players can buy tickets for a lottery. When the admin decides to end the lottery, one of the users that bought a ticket will be choosen at random and will win 90% of the balance so far and the admin will keep the remaining 10%.
 
 
-## What do I need to run this app?
+## **What do I need to run this app?**
 
 - [Truffle](https://github.com/trufflesuite/truffle)
 - [Ganache](https://github.com/trufflesuite/ganache-ui)
@@ -34,21 +34,20 @@ sudo npm install ganache-cli -g
 
 Or, you can download a GUI for Ganache here: https://www.trufflesuite.com/ganache.
 
-## How to run
+## **How to run**
 
-1. Run the Ganache app.
+1. Run the Ganache app and click on the "Quickstart - Ethereum" button.
 
 ![](assets/ganache.png)
 
 You will see an Ethereum network with 10 addresses. This is what we will be using to use this contracts.
 
-2. Deploy the code.
+2. Open a terminal (in the root directory) and **compile the code**.
 ```
 truffle deploy
 ```
-Note: You need to run this command in the root directory.
 
-3. Enter the truffle console.
+3. On the same terminal, **enter the truffle console**.
 
 ```
 truffle console
@@ -56,7 +55,7 @@ truffle console
 
 Once you're inside `truffle console`, you can then use the app.
 
-## Usage Examples
+## **Usage Examples**
 
 NotesContract Example:
 ```javascript
@@ -81,7 +80,7 @@ await notesContract.notes(2)
 await notesContract.notes(3)
 ```
 
-Example (Lottery Contract):
+LotteryContract Example:
 
 ```javascript
 // Save the contract in a variable
@@ -110,4 +109,7 @@ await lotteryContract.buyTicket({from: accounts[3], value: 1 * 10 ** 18})
 
 // Refund player 3
 await lotteryContract.refundTicket({from: accounts[3]})
+
+// Pick a winner
+await lotteryContract.pickWinner()
 ```

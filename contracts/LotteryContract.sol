@@ -6,7 +6,7 @@ pragma solidity ^0.8.7;
 contract LotteryContract {
   event TicketPurchase(address indexed player, uint256 amount);
   event TicketRefund(address indexed player, uint256 amount);
-  event MsgValue(string msg, uint256 value);
+  event PickWinner(uint256 winnerIndex, address winner, uint256 amountWinner, uint256 amountAdmin);
 
   struct Ticket {
     address payable player;
@@ -74,12 +74,15 @@ contract LotteryContract {
     }
 
     // Check if the ticket exists
-    require(found, "Ticket not found.");
+    require(found, "User does not have any tickets yet.");
 
     // Refund the ticket
     tickets[ticketIndex].player.transfer(ticketPrice);
-    totalTicketsSold--;
+    delete tickets[ticketIndex];
+
+    // Update total tickets sold and refunded
     totalTicketsRefunded++;
+    totalTicketsSold--;
 
     // Emit event
     emit TicketRefund(msg.sender, ticketPrice);
@@ -105,6 +108,9 @@ contract LotteryContract {
     payable(winner.player).transfer(balance * 9 / 10);
     // Transfer the rest to the contract
     payable(admin).transfer(balance * 1 / 10);
+
+    // Emit event
+    emit PickWinner(winnerIndex, winner.player, balance * 9 / 10, balance * 1 / 10);
   }
 
 
