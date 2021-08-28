@@ -6,10 +6,10 @@ pragma solidity ^0.8.7;
 contract LotteryContract {
   event TicketPurchase(address indexed player, uint256 amount);
   event TicketRefund(address indexed player, uint256 amount);
+  event MsgValue(string msg, uint256 value);
 
   struct Ticket {
     address payable player;
-    uint256 amount;
   }
 
   // Ticket storage
@@ -24,7 +24,7 @@ contract LotteryContract {
 
   // Lottery initial state
   constructor() {
-    ticketPrice = 1;
+    ticketPrice = 1 ether;
     totalTickets = 10;
     totalTicketsSold = 0;
     totalTicketsRefunded = 0;
@@ -41,28 +41,32 @@ contract LotteryContract {
     return address(this).balance;
   }
 
-  function buyTicket() external payable {
+  function buyTicket() public payable {
     require(totalTickets > totalTicketsSold, "No more tickets available for selling.");
     require(msg.value >= ticketPrice, "Not enough ETH sent to buy a ticket.");
+    require(msg.sender != admin, "You cannot buy tickets for yourself.");
 
     // Add ticket to the array
     tickets.push(Ticket({
-      player: payable(msg.sender),
-      amount: msg.value
+      player: payable(msg.sender)
     }));
 
+    // Update total tickets sold
     totalTicketsSold++;
+
+    // Emit event
     emit TicketPurchase(msg.sender, msg.value);
   }
 
-  function refundTicket(uint256 amount) external payable {
+  function refundTicket() external payable {
     require(totalTicketsSold > 0, "No tickets to refund.");
+    require(msg.sender != admin, "You cannot refund tickets for yourself.");
 
     // Find the ticket to refund
     bool found = false;
     uint256 ticketIndex = 0;
     for (uint256 i = 0; i < tickets.length; i++) {
-      if (tickets[i].player == msg.sender && tickets[i].amount == amount) {
+      if (tickets[i].player == msg.sender) {
         ticketIndex = i;
         found = true;
         break;
@@ -73,10 +77,12 @@ contract LotteryContract {
     require(found, "Ticket not found.");
 
     // Refund the ticket
-    tickets[ticketIndex].player.transfer(amount);
+    tickets[ticketIndex].player.transfer(ticketPrice);
     totalTicketsSold--;
     totalTicketsRefunded++;
-    emit TicketRefund(msg.sender, amount);
+
+    // Emit event
+    emit TicketRefund(msg.sender, ticketPrice);
   }
 
   function getTicketIndex(address player) external view returns (uint256) {
