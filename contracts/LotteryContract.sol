@@ -47,7 +47,7 @@ contract LotteryContract {
 
     // Add ticket to the array
     tickets.push(Ticket({
-      player: msg.sender,
+      player: payable(msg.sender),
       amount: msg.value
     }));
 
@@ -77,6 +77,95 @@ contract LotteryContract {
     totalTicketsSold--;
     totalTicketsRefunded++;
     emit TicketRefund(msg.sender, amount);
+  }
+
+  function getTicketIndex(address player) external view returns (uint256) {
+    for (uint256 i = 0; i < totalTicketsSold; i++) {
+      if (tickets[i].player == player) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
+  function pickWinner() external payable onlyOwner {
+    require(totalTicketsSold > 0, "No tickets to pick a winner from.");
+
+    uint256 winnerIndex = random(totalTicketsSold);
+    Ticket memory winner = tickets[winnerIndex];
+
+    uint256 balance = getBalance();
+    // Transfer player 90% of the balance
+    payable(winner.player).transfer(balance * 9 / 10);
+    // Transfer the rest to the contract
+    payable(admin).transfer(balance * 1 / 10);
+  }
+
+
+  /*
+  * @dev Function to get the ticket price (in ETH).
+  */
+  function getTicketPrice() external view returns (uint256) {
+    return ticketPrice;
+  }
+
+
+  /*
+  * @dev Function to get the total number of tickets available for sale.
+  */
+  function getTotalTickets() external view returns (uint256) {
+    return totalTickets;
+  }
+
+
+  /*
+  * @dev Function to get the total amount of tickets sold.
+  */
+  function getTotalTicketsSold() external view returns (uint256) {
+    return totalTicketsSold;
+  }
+
+
+  /*
+  * @dev Function to get the total amount of tickets refunded.
+  */
+  function getTotalTicketsRefunded() external view returns (uint256) {
+    return totalTicketsRefunded;
+  }
+
+
+  /*
+  * @dev Function to get the admin address.
+  */
+  function getAdmin() external view returns (address) {
+    return admin;
+  }
+
+
+  /*
+  * @dev Function to get a list of tickets owned by a player
+  */
+  function getTicketsByPlayer(address player) public view returns (Ticket[] memory) {
+    Ticket[] memory ticketsOfPlayer = new Ticket[](tickets.length);
+    uint256 ticketCount = 0;
+
+    for (uint256 i = 0; i < tickets.length; i++) {
+      if (tickets[i].player == player) {
+        ticketsOfPlayer[ticketCount] = tickets[i];
+        ticketCount++;
+      }
+    }
+
+    return ticketsOfPlayer;
+  }
+
+  ///// Helper functions /////
+  function random(uint256 max) internal pure returns (uint256) {
+    return uint256(keccak256(abi.encodePacked(max))) % max;
+  }
+
+  function random2(uint256 max) internal view returns (uint) {
+    return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, max))) % max;
   }
 
 }
